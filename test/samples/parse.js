@@ -503,6 +503,88 @@ var parseTests = [
 
 	},
 	{
+		name: 'If else syntax',
+		template: '{{#if foo}}foo{{else}}not foo{{/if}}',
+		parsed:
+			[ { t: 16,
+			    r: 'foo',
+			    f: 'foo',
+			    l: 'not foo' } ]
+	},
+	{
+		name: 'Nested If else syntax',
+		template:
+			'{{#if foo}}' +
+			'	foo' +
+			'	{{#if foo2}}' +
+			'		foo2' +
+			'		{{else}}' +
+			'		not foo2' +
+			'	{{/if}}'+
+			'{{else}}' +
+			'	bar' +
+			'{{/if}}',
+		parsed:
+			[ { t: 16,
+			    r: 'foo',
+			    f:
+			     [ ' foo ',
+			       { t: 16,
+			         r: 'foo2',
+			         f: ' foo2 ',
+			         l: ' not foo2 ' } ],
+			    l: ' bar' } ]
+	},
+	{
+		name: 'Each else syntax',
+		template: '{{#each foo:i}}foo #{{i+1}}{{else}}no foos{{/each}}',
+		parsed:
+			[ { t: 18,
+				r: 'foo',
+				i: 'i',
+				f:
+					[ 'foo #',
+						{ t: 2,
+							x: { r: [ 'i' ], s: '${0}+1' } } ],
+				l: 'no foos' } ]
+	},
+	{
+		name: 'Else not allowed in #unless',
+		template: '{{#unless foo}}not foo {{else}}foo?{{/unless}}',
+		error:
+			'{{else}} not allowed in {{#unless foo}} on line 1:24:\n{{#unless foo}}not foo {{else}}foo?{{/unless}}\n                       ^----'
+	},
+	{
+		name: 'Else not allowed in #with',
+		template: '{{#with foo}}with foo {{else}}no foo?{{/with}}',
+		error:
+			'{{else}} not allowed in {{#with foo}} on line 1:23:\n{{#with foo}}with foo {{else}}no foo?{{/with}}\n                      ^----'
+	},
+	{
+		name: 'Else is just a regular interpolator in {{#}}',
+		template: '{{#foo}}with foo {{else}}no foo?{{/foo}}',
+		parsed:
+			[ { t: 4,
+			    r: 'foo',
+			    f:
+			     [ 'with foo ',
+			       { t: 2, r: 'else' },
+			       'no foo?' ] } ]
+
+	},
+	{
+		name: 'Else is just a regular interpolator in {{^}}',
+		template: '{{^foo}}not foo {{else}}no foo?{{/foo}}',
+		parsed:
+			[ { t: 4,
+				r: 'foo',
+				n: true,
+				f:
+				 [ 'not foo ',
+				   { t: 2, r: 'else' },
+				   'no foo?' ] } ]
+},
+	{
 		name: 'Expression close syntax',
 		template: '{{#(foo*5 < 20)}}foo{{/()}}',
 		parsed: [

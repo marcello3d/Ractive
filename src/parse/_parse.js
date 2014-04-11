@@ -11,6 +11,7 @@
 // * r - Reference, e.g. 'mustache' in {{mustache}}
 // * t - Type code (e.g. 1 is text, 2 is interpolator...)
 // * f - Fragment. Contains a descriptor's children
+// * l - eLse fragment. Contains a descriptor's children for the else case
 // * e - Element name
 // * a - map of element Attributes, or proxy event/transition Arguments
 // * d - Dynamic proxy event/transition arguments

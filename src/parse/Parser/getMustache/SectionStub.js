@@ -57,19 +57,36 @@ define([
 		parser.pos += 1;
 
 		this.items = [];
+		this.elseItems = [];
 		next = parser.next();
 
+		var itemsOrElseItems = this.items;
+
 		while ( next ) {
+			if ( next.mustacheType === types.INTERPOLATOR && next.source === 'else') {
+				switch (this.type) {
+					case types.SECTION_IF:
+					case types.SECTION_EACH:
+						itemsOrElseItems = this.elseItems;
+						parser.getStub(); // throw away
+						next = parser.next();
+						continue;
+
+					case types.SECTION_UNLESS:
+					case types.SECTION_WITH:
+						throw new Error("{{else}} not allowed in {{" + openTag + "}} on line " + next.getLinePos());
+				}
+			}
+
 			if ( next.mustacheType === types.CLOSING ) {
 				validateClosing(openTag, closeTag, next);
 				parser.pos += 1;
 				break;
 			}
 
-			this.items.push( parser.getStub() );
+			itemsOrElseItems.push( parser.getStub() );
 			next = parser.next();
 		}
-
 	};
 
 	function validateClosing(openTag, closeTag, token) {
@@ -116,6 +133,10 @@ define([
 
 			if ( this.items.length ) {
 				json.f = jsonifyStubs( this.items, noStringify );
+			}
+
+			if ( this.elseItems.length ) {
+				json.l = jsonifyStubs( this.elseItems, noStringify );
 			}
 
 			this.json = json;
