@@ -39,7 +39,7 @@ define([
 		}
 
 
-		switch (firstToken.mustacheType) {
+		switch (this.type) {
 			case types.SECTION_IF:
 				closeTag = 'if';
 				break;
@@ -61,7 +61,7 @@ define([
 
 		while ( next ) {
 			if ( next.mustacheType === types.CLOSING ) {
-				validateClosing(this, openTag, closeTag, next);
+				validateClosing(openTag, closeTag, next);
 				parser.pos += 1;
 				break;
 			}
@@ -72,7 +72,7 @@ define([
 
 	};
 
-	function validateClosing(stub, openTag, closeTag, token) {
+	function validateClosing(openTag, closeTag, token) {
 		var closing = normaliseKeypath(token.ref.trim());
 
 		if (normaliseKeypath(closeTag.trim()).substr(0, closing.length) !== closing &&
