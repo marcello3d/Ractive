@@ -452,12 +452,64 @@ var parseTests = [
 			'                ^----'
 	},
 	{
+		name: 'Illegal closing section for {{#if}}',
+		template: '{{#if (foo*5 < 20)}}foo{{/wrong}}',
+		error:
+			'Could not parse template: Illegal closing section for {{#if (foo*5 < 20)}}: {{/wrong}}. Expected {{/if}} on line 1:24:\n' +
+			'{{#if (foo*5 < 20)}}foo{{/wrong}}\n' +
+			'                       ^----'
+	},
+	{
 		name: 'Illegal closing section for {{##(foo*5)}}',
 		template: '{{#(foo*5)}}foo{{/garbage}}',
 		error:
 			'Could not parse template: Illegal closing section for {{#(foo*5)}}: {{/garbage}}. Expected {{/()}} on line 1:16:\n' +
 			'{{#(foo*5)}}foo{{/garbage}}\n' +
 			'               ^----'
+	},
+	{
+		name: 'If syntax',
+		template: '{{#if foo}}foo{{/if}}',
+		parsed: [
+			{ t: 16, r: 'foo', f: 'foo' }
+		]
+	},
+	{
+		name: 'If syntax',
+		template: '{{#if (foo*5 < 20)}}foo{{/if}}',
+		parsed: [
+			{ t: 16,
+				x: { r: [ 'foo' ], s: '${0}*5<20' },
+				f: 'foo' }
+		]
+	},
+	{
+		name: 'Unless syntax',
+		template: '{{#unless foo}}foo{{/unless}}',
+		parsed: [
+			{ t: 17,
+				r: 'foo',
+				f: 'foo' }
+		]
+	},
+	{
+		name: 'Unless syntax',
+		template: '{{#unless (foo*5 < 20)}}foo{{/unless}}',
+		parsed: [
+			{ t: 17,
+				x: { r: [ 'foo' ], s: '${0}*5<20' },
+				f: 'foo' }
+		]
+
+	},
+	{
+		name: 'Expression close syntax',
+		template: '{{#(foo*5 < 20)}}foo{{/()}}',
+		parsed: [
+			{ t: 4,
+				x: { r: [ 'foo' ], s: '${0}*5<20' },
+				f: 'foo' }
+		]
 	}
 ];
 

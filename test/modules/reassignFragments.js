@@ -138,7 +138,7 @@ define([
 			var template = '{{#model:i}}{{#thing}}' +
 								'{{# .inner.length > 1}}' +
         							'<p>{{{format(inner)}}}</p>' +
-        						'{{/ inner}}' +
+        						'{{/ ()}}' +
     						'{{/thing}}{{/model}}'
     		var called = 0
 

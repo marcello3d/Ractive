@@ -58,6 +58,7 @@ define([
 					if ( index !== -1 ) {
 						mustache.ref = remaining.substr( 0, index );
 						tokenizer.pos += index;
+						mustache.source = tokenizer.str.substring(start, tokenizer.pos);
 						return mustache;
 					}
 				}
@@ -88,6 +89,7 @@ define([
 				if ( index !== -1 ) {
 					mustache.ref = remaining.substr( 0, index ).trim();
 					tokenizer.pos += index;
+                    mustache.source = tokenizer.str.substring(start, tokenizer.pos);
 					return mustache;
 				}
 			}
@@ -115,6 +117,7 @@ define([
 			mustache.indexRef = i;
 		}
 
+        mustache.source = tokenizer.str.substring(start, tokenizer.pos);
 		return mustache;
 	};
 

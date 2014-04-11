@@ -20,7 +20,14 @@ define([
 		this.ref = firstToken.ref;
 		this.indexRef = firstToken.indexRef;
 
-		this.inverted = ( firstToken.mustacheType === types.INVERTED );
+		this.type = firstToken.mustacheType;
+		this.inverted = ( this.type === types.INVERTED );
+		if (this.inverted) {
+			this.type = types.SECTION;
+		}
+
+		var openTag = firstToken.source;
+		var closeTag = firstToken.source.substr(1);
 
 		if ( firstToken.keypathExpression ) {
 			this.keypathExpr = new KeypathExpressionStub( firstToken.keypathExpression );
@@ -28,6 +35,23 @@ define([
 
 		if ( firstToken.expression ) {
 			this.expr = new ExpressionStub( firstToken.expression );
+			closeTag = '()';
+		}
+
+
+		switch (firstToken.mustacheType) {
+			case types.SECTION_IF:
+				closeTag = 'if';
+				break;
+			case types.SECTION_UNLESS:
+				closeTag = 'unless';
+				break;
+			case types.SECTION_EACH:
+				closeTag = 'each';
+				break;
+			case types.SECTION_WITH:
+				closeTag = 'with';
+				break;
 		}
 
 		parser.pos += 1;
@@ -37,7 +61,7 @@ define([
 
 		while ( next ) {
 			if ( next.mustacheType === types.CLOSING ) {
-				validateClosing(this, next);
+				validateClosing(this, openTag, closeTag, next);
 				parser.pos += 1;
 				break;
 			}
@@ -48,18 +72,14 @@ define([
 
 	};
 
-	function validateClosing(stub, token){
-		var opening = stub.ref, 
-			closing = normaliseKeypath( token.ref.trim() );
+	function validateClosing(stub, openTag, closeTag, token) {
+		var closing = normaliseKeypath(token.ref.trim());
 
-		if ( !opening || !closing ) { return; }
+		if (normaliseKeypath(closeTag.trim()).substr(0, closing.length) !== closing &&
+			normaliseKeypath(openTag.substr(1).trim()).substr(0, closing.length) !== closing) {
 
-		if( stub.indexRef ) { opening += ':' + stub.indexRef; }
-
-		if ( opening.substr( 0, closing.length) !== closing ) {
-
-			throw new Error( 'Could not parse template: Illegal closing section {{/' 
-				+ closing + '}}. Expected {{/' + stub.ref + '}} on line '+ token.getLinePos() );
+			throw new Error('Could not parse template: Illegal closing section for {{' + openTag + '}}: ' +
+				'{{/' + closing + '}}. Expected {{/' + closeTag + '}} on line ' + token.getLinePos());
 
 		}
 	}
@@ -72,7 +92,7 @@ define([
 				return this.json;
 			}
 
-			json = { t: types.SECTION };
+			json = { t: this.type };
 
 			if ( this.ref ) {
 				json.r = this.ref;

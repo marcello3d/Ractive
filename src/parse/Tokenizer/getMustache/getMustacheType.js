@@ -12,13 +12,26 @@ define([ 'config/types' ], function ( types ) {
 	};
 
 	return function ( tokenizer ) {
-		var type = mustacheTypes[ tokenizer.str.charAt( tokenizer.pos ) ];
+        var str = tokenizer.str;
+		var type = mustacheTypes[ str.charAt( tokenizer.pos ) ];
 
 		if ( !type ) {
 			return null;
 		}
 
 		tokenizer.pos += 1;
+
+		if (type === types.SECTION) {
+			if (tokenizer.getStringMatch('if ')) {
+				type = types.SECTION_IF;
+			} else if (tokenizer.getStringMatch('with ')) {
+				type = types.SECTION_WITH;
+			} else if (tokenizer.getStringMatch('each ')) {
+				type = types.SECTION_EACH;
+			} else if (tokenizer.getStringMatch('unless ')) {
+				type = types.SECTION_UNLESS;
+			}
+		}
 		return type;
 	};
 

@@ -15,6 +15,11 @@ define({
 
 	COMPONENT         : 15,
 
+	SECTION_IF        : 16,
+	SECTION_UNLESS    : 17,
+	SECTION_EACH      : 18,
+	SECTION_WITH      : 19,
+
 	NUMBER_LITERAL    : 20,
 	STRING_LITERAL    : 21,
 	ARRAY_LITERAL     : 22,
