@@ -10,6 +10,7 @@
 //
 // * r - Reference, e.g. 'mustache' in {{mustache}}
 // * t - Type code (e.g. 1 is text, 2 is interpolator...)
+// * c - Line number traCe info
 // * f - Fragment. Contains a descriptor's children
 // * l - eLse fragment. Contains a descriptor's children for the else case
 // * e - Element name

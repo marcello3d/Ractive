@@ -11,7 +11,7 @@ define([
 	return function ( token, preserveWhitespace ) {
 		if ( token.type === types.TEXT ) {
 			this.pos += 1;
-			return new TextStub( token, preserveWhitespace );
+			return new TextStub( token, preserveWhitespace, this.includeTraces );
 		}
 
 		return null;

@@ -25,6 +25,7 @@ define([
 		this.pos = 0;
 		this.options = options;
 		this.preserveWhitespace = options.preserveWhitespace;
+		this.includeTraces = options.includeTraces;
 
 		stubs = [];
 

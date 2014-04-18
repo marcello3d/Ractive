@@ -95,6 +95,13 @@ define([
 			}
 		}
 
+		if (!expr) {
+			if (start === tokenizer.pos) {
+				throw new Error("Invalid empty expression on line "+tokenizer.getLinePos());
+			}
+			throw new Error("Invalid expression '"+tokenizer.str.substring(start, tokenizer.pos)+"' on line "+tokenizer.getLinePos());
+		}
+
 		while ( expr.t === types.BRACKETED && expr.x ) {
 			expr = expr.x;
 		}

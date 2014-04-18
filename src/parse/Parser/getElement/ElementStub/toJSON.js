@@ -21,6 +21,9 @@ define([
 			t: types.ELEMENT,
 			e: this.tag
 		};
+		if ( this.trace ) {
+			json.c = this.trace.toJSON();
+		}
 
 		if ( this.doctype ) {
 			json.y = 1;

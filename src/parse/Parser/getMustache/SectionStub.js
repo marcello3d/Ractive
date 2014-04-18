@@ -17,12 +17,15 @@ define([
 	var SectionStub = function ( firstToken, parser ) {
 		var next;
 
+		if ( parser.includeTraces ) {
+			this.trace = firstToken.getLinePos();
+		}
 		this.ref = firstToken.ref;
 		this.indexRef = firstToken.indexRef;
 
 		this.type = firstToken.mustacheType;
 		this.inverted = ( this.type === types.INVERTED );
-		if (this.inverted) {
+		if ( this.inverted ) {
 			this.type = types.SECTION;
 		}
 
@@ -30,16 +33,16 @@ define([
 		var closeTag = firstToken.source.substr(1);
 
 		if ( firstToken.keypathExpression ) {
-			this.keypathExpr = new KeypathExpressionStub( firstToken.keypathExpression );
+			this.keypathExpr = new KeypathExpressionStub( firstToken.keypathExpression, parser );
 		}
 
 		if ( firstToken.expression ) {
-			this.expr = new ExpressionStub( firstToken.expression );
+			this.expr = new ExpressionStub( firstToken.expression, parser );
 			closeTag = '()';
 		}
 
 
-		switch (this.type) {
+		switch ( this.type ) {
 			case types.SECTION_IF:
 				closeTag = 'if';
 				break;
@@ -74,12 +77,12 @@ define([
 
 					case types.SECTION_UNLESS:
 					case types.SECTION_WITH:
-						throw new Error("{{else}} not allowed in {{" + openTag + "}} on line " + next.getLinePos());
+						throw new Error( "{{else}} not allowed in {{" + openTag + "}} on line " + next.getLinePos() );
 				}
 			}
 
 			if ( next.mustacheType === types.CLOSING ) {
-				validateClosing(openTag, closeTag, next);
+				validateClosing( openTag, closeTag, next );
 				parser.pos += 1;
 				break;
 			}
@@ -90,10 +93,10 @@ define([
 	};
 
 	function validateClosing(openTag, closeTag, token) {
-		var closing = normaliseKeypath(token.ref.trim());
+		var closing = normaliseKeypath( token.ref.trim() );
 
-		if (normaliseKeypath(closeTag.trim()).substr(0, closing.length) !== closing &&
-			normaliseKeypath(openTag.substr(1).trim()).substr(0, closing.length) !== closing) {
+		if ( normaliseKeypath( closeTag.trim()).substr(0, closing.length ) !== closing &&
+			 normaliseKeypath( openTag.substr(1).trim()).substr(0, closing.length ) !== closing ) {
 
 			throw new Error('Could not parse template: Illegal closing section for {{' + openTag + '}}: ' +
 				'{{/' + closing + '}}. Expected {{/' + closeTag + '}} on line ' + token.getLinePos());
@@ -109,7 +112,13 @@ define([
 				return this.json;
 			}
 
-			json = { t: this.type };
+			json = {
+				t: this.type
+			};
+
+			if ( this.trace ) {
+				json.c = this.trace.toJSON();
+			}
 
 			if ( this.ref ) {
 				json.r = this.ref;

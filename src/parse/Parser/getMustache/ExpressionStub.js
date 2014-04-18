@@ -8,8 +8,11 @@ define([
 
 	'use strict';
 
-	var ExpressionStub = function ( token ) {
+	var ExpressionStub = function ( token, parser ) {
 		this.refs = [];
+		if ( parser.includeTraces ) {
+			this.trace = token.getLinePos();
+		}
 
 		getRefs( token, this.refs );
 		this.str = stringify( token, this.refs );
@@ -22,6 +25,9 @@ define([
 					r: this.refs,
 					s: this.str
 				};
+				if ( this.trace ) {
+					this.json.c = this.trace.toJSON();
+				}
 			}
 
 			return this.json;

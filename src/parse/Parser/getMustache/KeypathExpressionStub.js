@@ -10,11 +10,17 @@ define([
 
 	var KeypathExpressionStub;
 
-	KeypathExpressionStub = function ( token ) {
+	KeypathExpressionStub = function ( token, parser ) {
 		this.json = {
 			r: token.r,
-			m: token.m.map( jsonify )
+			m: token.m.map( function(member) {
+				return jsonify( member, parser );
+			})
 		};
+
+		if ( parser.includeTraces ) {
+			this.json.c = token.getLinePos().toJSON();
+		}
 	};
 
 	KeypathExpressionStub.prototype = {
@@ -25,7 +31,7 @@ define([
 
 	return KeypathExpressionStub;
 
-	function jsonify ( member ) {
+	function jsonify ( member, parser ) {
 		// Straightforward property, e.g. `foo.bar`?
 		if ( member.n ) {
 			return member.n;
@@ -42,7 +48,7 @@ define([
 		}
 
 		// If none of the above, we need to process the AST
-		return new ExpressionStub( member.x ).toJSON();
+		return new ExpressionStub( member.x, parser ).toJSON();
 	}
 
 });

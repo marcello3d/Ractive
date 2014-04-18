@@ -14,8 +14,11 @@ define([ 'config/types' ], function ( types ) {
 		decodeCharacterReferences,
 		whitespace;
 
-	TextStub = function ( token, preserveWhitespace ) {
+	TextStub = function ( token, preserveWhitespace, includeTraces ) {
 		this.text = ( preserveWhitespace ? token.value : token.value.replace( whitespace, ' ' ) );
+		if (includeTraces) {
+			this.trace = token.getLinePos();
+		}
 	};
 
 	TextStub.prototype = {

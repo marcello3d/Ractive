@@ -13,16 +13,20 @@ define([
 	var MustacheStub = function ( token, parser ) {
 		this.type = ( token.type === types.TRIPLE ? types.TRIPLE : token.mustacheType );
 
+		if ( parser.includeTraces ) {
+			this.trace = token.getLinePos();
+		}
+
 		if ( token.ref ) {
 			this.ref = token.ref;
 		}
 
 		if ( token.keypathExpression ) {
-			this.keypathExpr = new KeypathExpressionStub( token.keypathExpression );
+			this.keypathExpr = new KeypathExpressionStub( token.keypathExpression, parser );
 		}
 
 		if ( token.expression ) {
-			this.expr = new ExpressionStub( token.expression );
+			this.expr = new ExpressionStub( token.expression, parser );
 		}
 
 		parser.pos += 1;
@@ -39,6 +43,10 @@ define([
 			json = {
 				t: this.type
 			};
+
+			if ( this.trace ) {
+				json.c = this.trace.toJSON();
+			}
 
 			if ( this.ref ) {
 				json.r = this.ref;

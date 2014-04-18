@@ -61,6 +61,10 @@ define([
 			this.tag = this.tag.substring( 3 );
 		}
 
+		if ( parser.includeTraces ) {
+			this.trace = firstToken.getLinePos();
+		}
+
 		// if this is a <pre> element, preserve whitespace within
 		preserveWhitespace = ( preserveWhitespace || lowerCaseTag === 'pre' || lowerCaseTag === 'style' || lowerCaseTag === 'script' );
 
