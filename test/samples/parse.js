@@ -64,6 +64,22 @@ var parseTests = [
 		template: "<div class={{myClass}}>contents</div>",
 		parsed: [{a:{"class":[{r:"myClass",t:2}]},"f":"contents",e:"div",t:7}]
 	},
+//	{
+//		name: "Element with conditional attribute",
+//		template: '<div class={{#foo}}foo{{/foo}}>contents</div>',
+//		parsed: [{a:{"class":[{r:"myClass",t:2}]},"f":"contents",e:"div",t:7}]
+//	},
+	{
+		name: "Plain HTML",
+		template: '<div><span>ok</span><span>ok2</span>contents</div>',
+		parsed:
+			[ { t: 7,
+			    e: 'div',
+			    f:
+			     [ { t: 7, e: 'span', f: 'ok' },
+			       { t: 7, e: 'span', f: 'ok2' },
+			       'contents' ] } ]
+	},
 	{
 		name: "Template with blacklisted elements (sanitize)",
 		template: "<style type='text/css'>body { font-family: 'Comic Sans MS'; }</style>",
@@ -270,8 +286,17 @@ var parseTests = [
 	{
 		name: 'Doctype declarations are handled',
 		template: '<!doctype html><html><head></head><body></body></html>',
-		parsed: [{t:7,e:'doctype',y:1,a:{html:null}},{t:7,e:'html',f:'<head></head><body></body>'}]
-	},
+		parsed:
+			[ { t: 7,
+			    e: 'doctype',
+			    y: 1,
+			    a: { html: null } },
+			  { t: 7,
+			    e: 'html',
+			    f:
+			     [ { t: 7, e: 'head' },
+			       { t: 7, e: 'body' } ] } ]
+},
 	{
 		name: 'Comments are stripped by default',
 		template: '<!-- this will disappear --><p>foo <!-- so will this --></p>',
@@ -286,7 +311,13 @@ var parseTests = [
 	{
 		name: 'Comments are left if required (with plain text)',
 		template: '<!-- this will not disappear --><p>foo <!-- nor will this --></p>',
-		parsed: [{"f":" this will not disappear ","t":9},{"e":"p","f":"foo <!-- nor will this -->","t":7}],
+		parsed:
+			[ { t: 9, f: ' this will not disappear ' },
+			  { t: 7,
+			    e: 'p',
+			    f:
+			     [ 'foo ',
+			       { t: 9, f: ' nor will this ' } ] } ],
 		options: { stripComments: false }
 	},
 	{
@@ -376,6 +407,14 @@ var parseTests = [
 		parsed: [{"t":4,"r":"steps","i":"stepIndex","f":[{"t":4,"n":true,"kx":{"r":"hiddenSteps","m":[{"t":30,"n":"stepIndex"}]},"f":[{"t":7,"e":"p","f":[{"t":2,"kx":{"r":"hiddenSteps","m":[{"t":30,"n":"stepIndex"}]}}]}]}]}] 
 	},
 	{
+		name: 'Empty mustache',
+		template: '<p><span>{{}}</span></p>',
+		error:
+			'Invalid empty expression on line 1:12:\n' +
+			'<p><span>{{}}</span></p>\n' +
+			'           ^----'
+	},
+	{
 		name: 'Illegal closing tag 1',
 		template: '<div> </div',
 		error:
@@ -445,9 +484,13 @@ var parseTests = [
 	},
 	{
 		name: 'Multiline illegal closing section for {{#foo}} #2',
-		template: 'hi{{name}}\nblah\n     {{#foo}}wew{{/wee}}\nfoo',
+		template:
+			'hi{{name}}\n' +
+			'blah\n' +
+			'     {{#foo}}wew{{/wee}}\n' +
+			'foo',
 		error:
-			'Could not parse template: Illegal closing section for {{#foo}}: {{/wee}}. Expected {{/foo}} on line 2:17:\n' +
+			'Could not parse template: Illegal closing section for {{#foo}}: {{/wee}}. Expected {{/foo}} on line 3:17:\n' +
 			'     {{#foo}}wew{{/wee}}\n' +
 			'                ^----'
 	},
@@ -583,7 +626,7 @@ var parseTests = [
 				 [ 'not foo ',
 				   { t: 2, r: 'else' },
 				   'no foo?' ] } ]
-},
+	},
 	{
 		name: 'Expression close syntax',
 		template: '{{#(foo*5 < 20)}}foo{{/()}}',
@@ -592,6 +635,64 @@ var parseTests = [
 				x: { r: [ 'foo' ], s: '${0}*5<20' },
 				f: 'foo' }
 		]
+	},
+	{
+		name: "SVG trace",
+		template:
+			"<svg xmlns=\"http://www.w3.org/2000/svg\">\n" +
+			"  <circle cx=\"{{x}}\" cy=\"{{y}}\" r=\"{{r}}\"/>\n" +
+			"</svg>",
+		options: {includeTraces:true},
+		parsed:
+			[ { t: 7,
+				e: 'svg',
+				c: [ 1, 1 ],
+				a: { xmlns: 'http://www.w3.org/2000/svg' },
+				f:
+				 [ { t: 7,
+					 e: 'circle',
+					 c: [ 2, 3 ],
+					 a:
+					  { cx: [ { t: 2, r: 'x' } ],
+						cy: [ { t: 2, r: 'y' } ],
+						r: [ { t: 2, r: 'r' } ] } } ] } ]
+	},
+	{
+		name: 'Multiline trace',
+		template: 'hi{{name}}\n' +
+			'<div>blah\n' +
+			'     {{#foo}}wew<span>Ain\'t \n' +
+			'       that {{grand}}?\n' +
+			'       </span>\n' +
+			'     {{/foo}}\n' +
+			'</div>',
+		options: {includeTraces:true},
+		parsed:
+			[ 'hi',
+			  { t: 2,
+				c: [ 1, 3 ],
+				r: 'name' },
+			  ' ',
+			  { t: 7,
+				e: 'div',
+				c: [ 2, 1 ],
+				f:
+				 [ 'blah ',
+				   { t: 4,
+					 c: [ 3, 6 ],
+					 r: 'foo',
+					 f:
+					  [ 'wew',
+						{ t: 7,
+						  e: 'span',
+						  c: [ 3, 17 ],
+						  f:
+						   [ 'Ain\'t that ',
+							 { t: 2,
+							   c: [ 4, 13 ],
+							   r: 'grand' },
+							 '?' ] },
+						' ' ] } ] } ]
 	}
 ];
 

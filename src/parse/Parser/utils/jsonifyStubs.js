@@ -1,22 +1,19 @@
-define([ 'parse/Parser/utils/stringifyStubs' ], function ( stringifyStubs ) {
+define([ ], function ( ) {
 
 	'use strict';
 
-	return function ( items, noStringify, topLevel ) {
-		var str, json;
+	return function ( items ) {
+		var mapped;
 
-		if ( !topLevel && !noStringify ) {
-			str = stringifyStubs( items );
-			if ( str !== false ) {
-				return str;
-			}
-		}
-
-		json = items.map( function ( item ) {
-			return item.toJSON( noStringify );
+		mapped = items.map( function ( item ) {
+			return item.toJSON( );
 		});
 
-		return json;
+		if ( mapped.length === 1 && typeof mapped[0] === 'string') {
+			return mapped[0];
+		}
+
+		return mapped;
 	};
 
 });
