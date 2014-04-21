@@ -10,15 +10,15 @@ define([
 
 	var KeypathExpressionStub;
 
-	KeypathExpressionStub = function ( token, parser ) {
+	KeypathExpressionStub = function ( expr, parser, token ) {
 		this.json = {
-			r: token.r,
-			m: token.m.map( function(member) {
+			r: expr.r,
+			m: expr.m.map( function(member) {
 				return jsonify( member, parser );
 			})
 		};
 
-		if ( parser.includeTraces ) {
+		if ( parser.includeTraces && token ) {
 			this.json.c = token.getLinePos().toJSON();
 		}
 	};

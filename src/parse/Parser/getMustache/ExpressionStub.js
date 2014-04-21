@@ -8,14 +8,14 @@ define([
 
 	'use strict';
 
-	var ExpressionStub = function ( token, parser ) {
+	var ExpressionStub = function ( expr, parser, token ) {
 		this.refs = [];
-		if ( parser.includeTraces ) {
+		if ( parser.includeTraces && token ) {
 			this.trace = token.getLinePos();
 		}
 
-		getRefs( token, this.refs );
-		this.str = stringify( token, this.refs );
+		getRefs( expr, this.refs );
+		this.str = stringify( expr, this.refs );
 	};
 
 	ExpressionStub.prototype = {

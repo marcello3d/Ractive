@@ -22,11 +22,11 @@ define([
 		}
 
 		if ( token.keypathExpression ) {
-			this.keypathExpr = new KeypathExpressionStub( token.keypathExpression, parser );
+			this.keypathExpr = new KeypathExpressionStub( token.keypathExpression, parser, token );
 		}
 
 		if ( token.expression ) {
-			this.expr = new ExpressionStub( token.expression, parser );
+			this.expr = new ExpressionStub( token.expression, parser, token );
 		}
 
 		parser.pos += 1;

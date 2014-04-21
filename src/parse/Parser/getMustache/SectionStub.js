@@ -33,11 +33,11 @@ define([
 		var closeTag = firstToken.source.substr(1);
 
 		if ( firstToken.keypathExpression ) {
-			this.keypathExpr = new KeypathExpressionStub( firstToken.keypathExpression, parser );
+			this.keypathExpr = new KeypathExpressionStub( firstToken.keypathExpression, parser, firstToken );
 		}
 
 		if ( firstToken.expression ) {
-			this.expr = new ExpressionStub( firstToken.expression, parser );
+			this.expr = new ExpressionStub( firstToken.expression, parser, firstToken );
 			closeTag = '()';
 		}
 
