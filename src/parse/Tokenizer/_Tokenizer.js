@@ -7,7 +7,8 @@ define([
 	'parse/Tokenizer/getExpression/_getExpression',
 
 	'parse/Tokenizer/utils/allowWhitespace',
-	'parse/Tokenizer/utils/getStringMatch'
+	'parse/Tokenizer/utils/getStringMatch',
+	'parse/Tokenizer/utils/getRegexMatch'
 ], function (
 	getMustache,
 	getComment,
@@ -17,7 +18,8 @@ define([
 	getExpression,
 
 	allowWhitespace,
-	getStringMatch
+	getStringMatch,
+	getRegexMatch
 ) {
 
 	'use strict';
@@ -124,6 +126,7 @@ define([
 		// utils
 		allowWhitespace: allowWhitespace,
 		getStringMatch: getStringMatch,
+		getRegexMatch: getRegexMatch,
 
 		remaining: function () {
 			return this.str.substring( this.pos );

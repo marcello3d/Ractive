@@ -96,26 +96,32 @@ define([
 		}
 
 		if (!expr) {
-			if (start === tokenizer.pos) {
-				throw new Error("Invalid empty expression on line "+tokenizer.getLinePos());
+			if (type !== types.SECTION_TRY) {
+				if (start === tokenizer.pos) {
+					throw new Error("Invalid empty expression on line "+tokenizer.getLinePos());
+				}
+				throw new Error("Invalid expression '"+tokenizer.str.substring(start, tokenizer.pos)+"' on line "+tokenizer.getLinePos());
 			}
-			throw new Error("Invalid expression '"+tokenizer.str.substring(start, tokenizer.pos)+"' on line "+tokenizer.getLinePos());
-		}
-
-		while ( expr.t === types.BRACKETED && expr.x ) {
-			expr = expr.x;
-		}
-
-		// special case - integers should be treated as array members references,
-		// rather than as expressions in their own right
-		if ( expr.t === types.REFERENCE ) {
-			mustache.ref = expr.n;
-		} else if ( expr.t === types.NUMBER_LITERAL && arrayMember.test( expr.v ) ) {
-			mustache.ref = expr.v;
-		} else if ( keypathExpression = getKeypathExpression( expr ) ) {
-			mustache.keypathExpression = keypathExpression;
 		} else {
-			mustache.expression = expr;
+			if (type === types.SECTION_TRY) {
+				throw new Error("Invalid expression '"+tokenizer.str.substring(start, tokenizer.pos)+"' on line "+tokenizer.getLinePos());
+			}
+
+			while ( expr.t === types.BRACKETED && expr.x ) {
+				expr = expr.x;
+			}
+
+			// special case - integers should be treated as array members references,
+			// rather than as expressions in their own right
+			if ( expr.t === types.REFERENCE ) {
+				mustache.ref = expr.n;
+			} else if ( expr.t === types.NUMBER_LITERAL && arrayMember.test( expr.v ) ) {
+				mustache.ref = expr.v;
+			} else if ( keypathExpression = getKeypathExpression( expr ) ) {
+				mustache.keypathExpression = keypathExpression;
+			} else {
+				mustache.expression = expr;
+			}
 		}
 
 		// optional index reference

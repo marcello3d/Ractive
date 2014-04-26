@@ -15,10 +15,6 @@ define({
 
 	COMPONENT         : 15,
 
-	SECTION_IF        : 16,
-	SECTION_UNLESS    : 17,
-	SECTION_EACH      : 18,
-	SECTION_WITH      : 19,
 
 	NUMBER_LITERAL    : 20,
 	STRING_LITERAL    : 21,
@@ -38,5 +34,11 @@ define({
 	CONDITIONAL       : 35,
 	INFIX_OPERATOR    : 36,
 
-	INVOCATION        : 40
+	INVOCATION        : 40,
+
+	SECTION_IF        : 50,
+	SECTION_UNLESS    : 51,
+	SECTION_EACH      : 52,
+	SECTION_WITH      : 53,
+	SECTION_TRY       : 54
 });

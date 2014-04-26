@@ -22,14 +22,22 @@ define([ 'config/types' ], function ( types ) {
 		tokenizer.pos += 1;
 
 		if (type === types.SECTION) {
-			if (tokenizer.getStringMatch('if ')) {
-				type = types.SECTION_IF;
-			} else if (tokenizer.getStringMatch('with ')) {
-				type = types.SECTION_WITH;
-			} else if (tokenizer.getStringMatch('each ')) {
-				type = types.SECTION_EACH;
-			} else if (tokenizer.getStringMatch('unless ')) {
-				type = types.SECTION_UNLESS;
+			var match = tokenizer.getRegexMatch(/^\w+\b/);
+			if (match) {
+				tokenizer.pos += match[0].length;
+				switch (match[0]) {
+					case 'if':
+						return types.SECTION_IF;
+					case 'with':
+						return types.SECTION_WITH;
+					case 'each':
+						return types.SECTION_EACH;
+					case 'unless':
+						return types.SECTION_UNLESS;
+					case 'try':
+						return types.SECTION_TRY;
+				}
+				tokenizer.pos -= match[0].length;
 			}
 		}
 		return type;

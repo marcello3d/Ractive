@@ -514,14 +514,14 @@ var parseTests = [
 		name: 'If syntax',
 		template: '{{#if foo}}foo{{/if}}',
 		parsed: [
-			{ t: 16, r: 'foo', f: 'foo' }
+			{ t: 50, r: 'foo', f: 'foo' }
 		]
 	},
 	{
 		name: 'If syntax',
 		template: '{{#if (foo*5 < 20)}}foo{{/if}}',
 		parsed: [
-			{ t: 16,
+			{ t: 50,
 				x: { r: [ 'foo' ], s: '${0}*5<20' },
 				f: 'foo' }
 		]
@@ -530,7 +530,7 @@ var parseTests = [
 		name: 'Unless syntax',
 		template: '{{#unless foo}}foo{{/unless}}',
 		parsed: [
-			{ t: 17,
+			{ t: 51,
 				r: 'foo',
 				f: 'foo' }
 		]
@@ -539,7 +539,7 @@ var parseTests = [
 		name: 'Unless syntax',
 		template: '{{#unless (foo*5 < 20)}}foo{{/unless}}',
 		parsed: [
-			{ t: 17,
+			{ t: 51,
 				x: { r: [ 'foo' ], s: '${0}*5<20' },
 				f: 'foo' }
 		]
@@ -549,7 +549,7 @@ var parseTests = [
 		name: 'If else syntax',
 		template: '{{#if foo}}foo{{else}}not foo{{/if}}',
 		parsed:
-			[ { t: 16,
+			[ { t: 50,
 			    r: 'foo',
 			    f: 'foo',
 			    l: 'not foo' } ]
@@ -568,11 +568,11 @@ var parseTests = [
 			'	bar' +
 			'{{/if}}',
 		parsed:
-			[ { t: 16,
+			[ { t: 50,
 			    r: 'foo',
 			    f:
 			     [ ' foo ',
-			       { t: 16,
+			       { t: 50,
 			         r: 'foo2',
 			         f: ' foo2 ',
 			         l: ' not foo2 ' } ],
@@ -582,7 +582,7 @@ var parseTests = [
 		name: 'Each else syntax',
 		template: '{{#each foo:i}}foo #{{i+1}}{{else}}no foos{{/each}}',
 		parsed:
-			[ { t: 18,
+			[ { t: 52,
 				r: 'foo',
 				i: 'i',
 				f:
@@ -693,6 +693,52 @@ var parseTests = [
 							   r: 'grand' },
 							 '?' ] },
 						' ' ] } ] } ]
+	},
+	{
+		name: "Mixture of HTML-able and non-HTML-able elements in template with Traces",
+		template: "<div><p>HTML</p><p>{{mustache}}</p></div>",
+		options: {includeTraces:true},
+		parsed:
+			[ { t: 7,
+			    e: 'div',
+			    c: [ 1, 1 ],
+			    f:
+			     [ { t: 7,
+			         e: 'p',
+			         c: [ 1, 6 ],
+			         f: 'HTML' },
+			       { t: 7,
+			         e: 'p',
+			         c: [ 1, 17 ],
+			         f:
+			          [ { t: 2,
+			              c: [ 1, 20 ],
+			              r: 'mustache' } ] } ] } ]
+	},
+	{
+		name: "Try block",
+		template: "{{#try}} blah {{/try}}",
+		options: {includeTraces:true},
+		parsed:
+			[ { t: 54,
+			    c: [ 1, 1 ],
+			    f: ' blah ' } ]
+	},
+	{
+		name: "Bad try block",
+		template: "{{#try haha}} blah {{/try}}",
+		options: {includeTraces:true},
+		error: "Invalid expression \'#try haha\' on line 1:12:\n{{#try haha}} blah {{/try}}\n           ^----"
+	},
+	{
+		name: "Try else block",
+		template: "{{#try}} blah {{else}} blah2 {{/try}}",
+		options: {includeTraces:true},
+		parsed:
+			[ { t: 54,
+			    c: [ 1, 1 ],
+			    f: ' blah ',
+			    l: ' blah2 ' } ]
 	}
 ];
 

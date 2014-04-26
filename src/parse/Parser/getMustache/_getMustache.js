@@ -17,6 +17,7 @@ define([
 				 token.mustacheType === types.SECTION_UNLESS ||
 				 token.mustacheType === types.SECTION_WITH ||
 				 token.mustacheType === types.SECTION_EACH ||
+				 token.mustacheType === types.SECTION_TRY ||
 				 token.mustacheType === types.INVERTED) {
 				return new SectionStub( token, this );
 			}

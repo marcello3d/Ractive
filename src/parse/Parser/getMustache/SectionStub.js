@@ -55,6 +55,12 @@ define([
 			case types.SECTION_WITH:
 				closeTag = 'with';
 				break;
+			case types.SECTION_TRY:
+				if (this.expr || this.keypathExpr) {
+					throw new Error( "Unexpected arguments to {{#try}} on line " + firstToken.getLinePos() );
+				}
+				closeTag = 'try';
+				break;
 		}
 
 		parser.pos += 1;
@@ -70,6 +76,7 @@ define([
 				switch (this.type) {
 					case types.SECTION_IF:
 					case types.SECTION_EACH:
+					case types.SECTION_TRY:
 						itemsOrElseItems = this.elseItems;
 						parser.getStub(); // throw away
 						next = parser.next();
@@ -79,9 +86,7 @@ define([
 					case types.SECTION_WITH:
 						throw new Error( "{{else}} not allowed in {{" + openTag + "}} on line " + next.getLinePos() );
 				}
-			}
-
-			if ( next.mustacheType === types.CLOSING ) {
+			} else if ( next.mustacheType === types.CLOSING ) {
 				validateClosing( openTag, closeTag, next );
 				parser.pos += 1;
 				break;
