@@ -27,6 +27,7 @@ define([
 	// Section
 	DomSection = function ( options, docFrag ) {
 		this.type = types.SECTION;
+		this.subtype = options.descriptor.t;
 		this.inverted = !!options.descriptor.n;
 
 		this.fragments = [];

@@ -1,9 +1,11 @@
 define([
 	'utils/isArray',
-	'utils/isObject'
+	'utils/isObject',
+	'config/types',
 ], function (
 	isArray,
-	isObject
+	isObject,
+	types
 ) {
 
 	'use strict';
@@ -16,6 +18,31 @@ define([
 			pElement:   section.parentFragment.pElement,
 			owner:      section
 		};
+
+		// Explicit section types
+		switch (section.descriptor.t) {
+			case types.SECTION_IF:
+				updateConditionalSection( section, value, false, fragmentOptions );
+				return;
+
+			case types.SECTION_UNLESS:
+				updateConditionalSection( section, value, true, fragmentOptions );
+				return;
+
+			case types.SECTION_EACH:
+				if ( isArray( value ) ) {
+					updateListSection( section, value, fragmentOptions );
+				} else {
+					updateListObjectSection( section, value, fragmentOptions );
+				}
+				return;
+
+			case types.SECTION_WITH:
+				updateContextSection( section, fragmentOptions );
+				return;
+		}
+
+		// Generic sections
 
 		// if section is inverted, only check for truthiness/falsiness
 		if ( section.descriptor.n ) {

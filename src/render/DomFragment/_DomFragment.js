@@ -84,6 +84,11 @@ define([
 
 			switch ( options.descriptor.t ) {
 				case types.INTERPOLATOR: return new Interpolator( options, this.docFrag );
+				case types.SECTION_IF:
+				case types.SECTION_UNLESS:
+				case types.SECTION_EACH:
+				case types.SECTION_WITH:
+				case types.SECTION_TRY:
 				case types.SECTION:      return new Section( options, this.docFrag );
 				case types.TRIPLE:       return new Triple( options, this.docFrag );
 				case types.ELEMENT:
